@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Header, Input, Button } from "semantic-ui-react";
+import { Container, Header, Input, Button, Message } from "semantic-ui-react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 
@@ -8,8 +8,40 @@ class Register extends React.Component {
     firstname: "",
     lastname: "",
     username: "",
+    userNameError: "",
     password: "",
-    email: ""
+    passwordError: "",
+    email: "",
+    emailError: ""
+  };
+
+  onSubmit = async () => {
+    this.setState({
+      userNameError: "",
+      emailError: "",
+      passwordError: ""
+    });
+
+    const { firstname, lastname, username, password, email } = this.state;
+    const response = await this.props.mutate({
+      variables: { firstname, lastname, username, password, email }
+    });
+
+    const { ok, errors } = response.data.registerUser;
+
+    if (ok) {
+      this.props.history.push("/");
+    } else {
+      const err = {};
+      errors.forEach(({ path, message }) => {
+        // err['passwordError'] = 'too long..';
+        err[`${path}Error`] = message;
+      });
+      console.log(err);
+      this.setState(err);
+    }
+
+    console.log(response);
   };
 
   onChange = e => {
@@ -17,16 +49,31 @@ class Register extends React.Component {
     this.setState({ [name]: value });
   };
 
-  onSubmit = async () => {
-    const response = await this.props.mutate({
-      variables: this.state
-    });
-
-    console.log(response);
-  };
-
   render() {
-    const { firstname, lastname, username, password, email } = this.state;
+    const {
+      firstname,
+      lastname,
+      username,
+      password,
+      email,
+      userNameError,
+      passwordError,
+      emailError
+    } = this.state;
+
+    const errorList = [];
+
+    if (userNameError) {
+      errorList.push(userNameError);
+    }
+
+    if (emailError) {
+      errorList.push(emailError);
+    }
+
+    if (passwordError) {
+      errorList.push(passwordError);
+    }
 
     return (
       <Container>
@@ -48,6 +95,7 @@ class Register extends React.Component {
         ></Input>
         <br />
         <Input
+          error={!!userNameError}
           name="username"
           onChange={this.onChange}
           value={username}
@@ -56,6 +104,7 @@ class Register extends React.Component {
         ></Input>
         <br />
         <Input
+          error={!!passwordError}
           name="password"
           onChange={this.onChange}
           value={password}
@@ -65,6 +114,7 @@ class Register extends React.Component {
         ></Input>
         <br />
         <Input
+          error={!!emailError}
           name="email"
           onChange={this.onChange}
           value={email}
@@ -73,6 +123,13 @@ class Register extends React.Component {
         ></Input>
         <br />
         <Button onClick={this.onSubmit}>Submit</Button>
+        {userNameError || emailError || passwordError ? (
+          <Message
+            error
+            header="There was some errors with your submission"
+            list={errorList}
+          />
+        ) : null}
       </Container>
     );
   }
@@ -92,7 +149,13 @@ const registerMutation = gql`
       userName: $username
       password: $password
       email: $email
-    )
+    ) {
+      ok
+      errors {
+        path
+        message
+      }
+    }
   }
 `;
 
