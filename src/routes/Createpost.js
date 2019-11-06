@@ -28,11 +28,16 @@ class Createpost extends React.Component {
   onSubmit = async () => {
     /* eslint-disable-next-line */
     const { userId, title, content } = this;
-
-    const response = await this.props.mutate({
-      /* eslint-disable-next-line */
-      variables: { userId: parseInt(this.userId), title, content }
-    });
+    let response = null;
+    try {
+      response = await this.props.mutate({
+        /* eslint-disable-next-line */
+        variables: { userId: parseInt(this.userId), title, content }
+      });
+    } catch (err) {
+      this.props.history.push("/login");
+      return;
+    }
 
     console.log(response);
 
