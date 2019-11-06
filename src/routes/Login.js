@@ -107,7 +107,7 @@ class Login extends React.Component {
   }
 }
 
-//#region gql sorgusu
+// #region gql sorgusu
 const loginMutation = gql`
   mutation($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -121,6 +121,6 @@ const loginMutation = gql`
     }
   }
 `;
-//#endregion
+// #endregion
 
 export default graphql(loginMutation)(observer(Login));
