@@ -22,9 +22,12 @@ const isAuthenticated = () => {
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
+    // eslint-disable-next-line react/jsx-props-no-spreading
     {...rest}
+    // eslint-disable-next-line no-confusing-arrow
     render={props =>
       isAuthenticated() ? (
+        // eslint-disable-next-line react/jsx-props-no-spreading
         <Component {...props} />
       ) : (
         <Redirect
