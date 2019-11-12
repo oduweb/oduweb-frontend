@@ -12,6 +12,7 @@ import { extendObservable } from "mobx";
 import { observer } from "mobx-react";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
+import _ from "lodash";
 
 class Login extends React.Component {
   constructor(props) {
@@ -53,7 +54,19 @@ class Login extends React.Component {
     this[name] = value;
   };
 
+  setSession = () => {
+    const list = [{ username: "tolga", password: 123 }];
+
+    sessionStorage.setItem("List", JSON.stringify(list));
+
+    const result = JSON.parse(sessionStorage.getItem("List"));
+
+    console.log(result[0].username);
+  };
+
   render() {
+    this.setSession();
+
     const {
       email,
       password,
